@@ -17,7 +17,7 @@ const createItem = async (req, res) => {
         }
 
         // Ensure files are an array
-        const images = Array.isArray(req.files) ? req.files.map(file => file.path) : [];
+        const images = req.files.map(file => file.path);
 
         // Create item
         const newItem = await Item.create({
@@ -37,6 +37,10 @@ const createItem = async (req, res) => {
         res.status(500).json({ error: error.message || "Server error" });
     }
 };
-const getItems = async (req, res) => { const items = await Item.find().populate("user", "name email"); res.json(items); };
+
+const getItems = async (req, res) => {
+    const items = await Item.find().populate("user", "name email");
+    res.json(items);
+};
 
 module.exports = { createItem, getItems };

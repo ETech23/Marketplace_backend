@@ -5,7 +5,6 @@ const multer = require("multer");
 const { storage } = require("../../config/cloudinary"); // ✅ Correct import for Cloudinary storage
 
 const upload = multer({ storage }); // ✅ Multer storage using Cloudinary
-
 const router = express.Router();
 
 // ✅ Debugging route (remove after testing)
