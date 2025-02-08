@@ -2,24 +2,24 @@ const Item = require("../models/Item");
 
 const createItem = async (req, res) => {
     try {
-        console.log("DEBUG: Received body:", req.body); // ✅ Ensure fields are received
-        console.log("DEBUG: Received files:", req.files); // ✅ Ensure files are received
+        console.log("DEBUG: Received body:", req.body);
+        console.log("DEBUG: Received files:", req.files);
 
-        // If no files were uploaded
+        // Ensure files exist
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({ error: "At least one image is required." });
         }
 
-        // If any required field is missing
+        // Ensure required fields are present
         const { name, price, currency, description, location, category } = req.body;
         if (!name || !price || !description) {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
-        // Ensure files are an array before mapping
+        // Ensure files are an array
         const images = Array.isArray(req.files) ? req.files.map(file => file.path) : [];
 
-        // Create new item
+        // Create item
         const newItem = await Item.create({
             name,
             price,
@@ -28,16 +28,15 @@ const createItem = async (req, res) => {
             location,
             category,
             images,
-            user: req.user.id
+            user: req.user ? req.user.id : null, // ✅ Prevents crash if `req.user` is missing
         });
 
         res.status(201).json(newItem);
     } catch (error) {
-        console.error("Error saving item:", error);
-        res.status(500).json({ error: "Server error" });
+        console.error("❌ ERROR: Internal Server Error", error); // ✅ Detailed error log
+        res.status(500).json({ error: error.message || "Server error" });
     }
 };
-
 const getItems = async (req, res) => { const items = await Item.find().populate("user", "name email"); res.json(items); };
 
 module.exports = { createItem, getItems };
