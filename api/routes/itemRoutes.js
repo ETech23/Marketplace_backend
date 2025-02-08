@@ -2,19 +2,22 @@ const express = require("express");
 const { createItem, getItems } = require("../controllers/itemController");
 const { protect } = require("../middleware/authMiddleware");
 const multer = require("multer");
-const { storage } = require("../../config/cloudinary"); // ✅ Correct import for Cloudinary storage
+const { storage } = require("../../config/cloudinary");
 
-const upload = multer({ storage }); // ✅ Multer storage using Cloudinary
+// Debug Multer Storage
+console.log("USING MULTER STORAGE:", storage);
+
+const upload = multer({ storage }); // ✅ Ensure only Cloudinary storage is used
+
 const router = express.Router();
 
-// ✅ Debugging route (remove after testing)
+// Debugging route
 router.post("/debug", protect, upload.array("media", 3), (req, res) => {
-    console.log("Received body:", req.body);  // Check if name, price, description exist
-    console.log("Received files:", req.files);  // Check if files are received
-    res.json({ message: "Debugging request received" });
+  console.log("Received body:", req.body);
+  console.log("Received files:", req.files);
+  res.json({ message: "Debugging request received", files: req.files });
 });
 
-// ✅ Actual item creation route
 router.post("/", protect, upload.array("media", 3), createItem);
 router.get("/", getItems);
 
